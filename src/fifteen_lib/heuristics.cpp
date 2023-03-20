@@ -1,7 +1,4 @@
 #include "heuristics.hpp"
-#include <array>
-#include <cstdint>
-#include <iostream>
 #include <concepts>
 
 template <std::integral T>
@@ -16,6 +13,7 @@ static constexpr auto constexpr_abs(T a) -> uint32_t {
 // returns 
 template<size_t N = 4>
 struct md_lookup {
+    static constexpr auto S = N;
     static constexpr auto SIZE = N * N;
     static constexpr auto initialize_lookup() -> std::array<std::array<uint8_t, SIZE>, SIZE> {
         std::array<std::array<uint8_t, SIZE> ,SIZE> manhattan;
@@ -32,6 +30,10 @@ struct md_lookup {
     }
     static constexpr std::array<std::array<uint8_t, SIZE> ,SIZE> table{initialize_lookup()};
 };
+
+auto get_md_lookup() -> const std::array<std::array<uint8_t, 16> ,16> {
+    return md_lookup<>::table;
+}
 
 auto manhattan_distance(fifteen board) -> uint32_t {
     uint32_t acc = 0;

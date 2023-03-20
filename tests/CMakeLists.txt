@@ -13,8 +13,11 @@ add_library(GTest::GTest INTERFACE IMPORTED)
 target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
 add_executable(heuristics_test heuristics_test.cpp)
+add_executable(fifteen_test fifteen_test.cpp)
 
-include_directories(../src/fifteen)
-target_link_libraries(heuristics_test PRIVATE GTest::GTest)
+include_directories(../src/fifteen_lib)
+target_link_libraries(heuristics_test PRIVATE GTest::GTest fifteen_lib)
+target_link_libraries(fifteen_test PRIVATE GTest::GTest fifteen_lib)
 
 add_test(heuristics_gtests heuristics_test)
+add_test(fifteen_gtests fifteen_test)
