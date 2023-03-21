@@ -1,4 +1,6 @@
 #pragma once
+#include <array>
+#include <iostream>
 #include <cstdint>
 #include <cstdlib>
 #include <random>
@@ -7,56 +9,63 @@
 #include <cstdio>
 
 struct fifteen {
-    using state_mask = uint64_t;
+    using state_type = uint64_t;
+    using index_type = uint8_t;
+    using value_type = uint8_t;
 
     constexpr fifteen() = default;
-    constexpr fifteen(state_mask state);
+    constexpr fifteen(state_type state);
 
-    auto constexpr set(uint8_t index, uint64_t value) -> void;
-    auto constexpr get(uint8_t index) const -> uint8_t;
-    auto constexpr correctly_placed() const -> uint8_t;
-    auto constexpr misplaced() const -> uint8_t;
+    auto constexpr get(index_type index) const -> value_type;
+    auto constexpr set(index_type index, state_type value) -> void;
+    auto constexpr swap(index_type index1, index_type index2) -> void;
+
+    auto constexpr correctly_placed() const -> index_type;
+    auto constexpr misplaced() const -> index_type;
     auto constexpr is_solved() const -> bool;
-    auto constexpr swap(uint8_t index1, uint8_t index2) -> void;
-
-    state_mask state;
-    static constexpr uint64_t msb_64bit_mask = 0xF000000000000000;
-    static constexpr uint64_t correct_placement = 0x123456789ABCDEF0;
-
-    auto static get_random() -> fifteen;
-    auto static constexpr get_correct() -> fifteen;
+    auto constexpr is_valid() const -> bool;
+    auto constexpr is_solvable() const -> bool;
 
     auto constexpr operator==(const fifteen& other) const -> bool;
     auto constexpr operator!=(const fifteen& other) const -> bool;
 
     auto print() const -> void;
+
+    auto static get_random() -> fifteen;
+    auto static constexpr get_solved() -> fifteen;
+
+    static constexpr state_type msb_64bit_mask = 0xF000000000000000;
+    static constexpr state_type correct_placement = 0x123456789ABCDEF0;
+
+    state_type state;
 };
 
-constexpr fifteen::fifteen(state_mask state) : state(state) {}
-auto constexpr fifteen::set(uint8_t index, uint64_t value) -> void {
-    uint64_t offset = index << 2;
-    uint64_t mask = ~(msb_64bit_mask >> offset);
+constexpr fifteen::fifteen(state_type state) : state(state) {}
+
+auto constexpr fifteen::set(index_type index, state_type value) -> void {
+    state_type offset = index << 2;
+    state_type mask = ~(msb_64bit_mask >> offset);
     state = (state & mask) | (value << (60 - offset));
 }
 
-auto constexpr fifteen::get(uint8_t index) const -> uint8_t {
-    uint8_t offset = index << 2;
+auto constexpr fifteen::get(index_type index) const -> value_type {
+    index_type offset = index << 2;
     return (state & (msb_64bit_mask >> offset)) >> (60 - offset);
 }
 
-auto constexpr fifteen::correctly_placed() const -> uint8_t {
-    uint64_t in_place = state & correct_placement;
-    uint8_t cnt = 0;
-    uint64_t mask = ~msb_64bit_mask;
+auto constexpr fifteen::correctly_placed() const -> index_type {
+    state_type in_place = state & correct_placement;
+    index_type cnt = 0;
+    state_type mask = msb_64bit_mask;
     for(int i = 0; i < 15; i++) {
         cnt += ((in_place & mask) != 0);
         mask >>= 4;
     }
-    cnt += ((state & 0xF) == 0);
+    cnt += ((in_place & 0xF) == 0);
     return cnt;
 }
 
-auto constexpr fifteen::misplaced() const -> uint8_t {
+auto constexpr fifteen::misplaced() const -> index_type {
     return 16 - correctly_placed();
 }
 
@@ -65,16 +74,35 @@ auto constexpr fifteen::is_solved() const -> bool {
     return state == correct_placement;
 }
 
-auto constexpr fifteen::swap(uint8_t index1, uint8_t index2) -> void {
+auto constexpr fifteen::is_valid() const -> bool {
+    auto values_present = std::array<value_type, 16>{};
+    for(auto i = 0; i < 16; i++) {
+        auto value = get(i);
+        if(value > 15) {
+            return false;
+        }
+        values_present[value]++;
+        if(values_present[value] > 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto constexpr fifteen::is_solvable() const -> bool {
+    return true;
+}
+
+auto constexpr fifteen::swap(index_type index1, index_type index2) -> void {
     auto val2 = get(index1);
     set(index1, get(index2));
     set(index2, val2);
 }
 
 inline auto fifteen::get_random() -> fifteen {
-    fifteen a;
-    std::vector<int> numbers = {1,2,3,4,5,6,7,8,9,0xA,0xB,0xC,0xD,0xE,0xF};
-    std::random_device rd;
+    auto a = fifteen{};
+    auto numbers = std::vector<int>{1,2,3,4,5,6,7,8,9,0xA,0xB,0xC,0xD,0xE,0xF};
+    auto rd = std::random_device{};
     auto rng = std::default_random_engine { rd() };
     std::shuffle(std::begin(numbers), std::end(numbers), rng);
     for(int i = 0; i < 16; i++) {
@@ -83,7 +111,7 @@ inline auto fifteen::get_random() -> fifteen {
     return a;
 }
 
-auto constexpr fifteen::get_correct() -> fifteen {
+auto constexpr fifteen::get_solved() -> fifteen {
     return fifteen(correct_placement);
 }
 
@@ -96,7 +124,7 @@ auto constexpr fifteen::operator!=(const fifteen& other) const -> bool {
 }
 
 inline auto fifteen::print() const -> void {
-    for(int i = 0; i <= 3; i++) {
+    for(auto i = 0; i <= 3; i++) {
         std::printf("[%2d][%2d][%2d][%2d]\n", get(4 * i), get(4 * i + 1), get(4 * i + 2), get(4 * i + 3));
     }
 }

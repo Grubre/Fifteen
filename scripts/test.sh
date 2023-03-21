@@ -1,3 +1,3 @@
 cd build/Debug
-ctest .
+ctest . --output-on-failure --VV
 cd ../..

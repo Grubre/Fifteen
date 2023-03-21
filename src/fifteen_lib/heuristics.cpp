@@ -51,6 +51,6 @@ auto walking_distance(fifteen) -> uint32_t {
     //TODO
 }
 
-auto misplaced_tile(fifteen) -> uint32_t {
-    //TODO
+auto misplaced_tile(fifteen f) -> uint32_t {
+    return f.misplaced();
 }

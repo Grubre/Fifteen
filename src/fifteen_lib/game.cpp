@@ -1,52 +1,24 @@
 #include "game.hpp"
+#include <queue>
 
-auto game::start() -> void {
-    m_board = fifteen::get_random();
-    for(int i = 0; i < 16; i++) {
-        if(m_board.get(i) == 0) {
-            zero_position = i;
-            break;
-        }
+using move_sequence = checked_fifteen::move_sequence;
+
+auto find_solution(checked_fifteen start, std::function<int(const fifteen)> heuristic) -> std::optional<move_sequence> {
+    if(!(start.board().is_valid() && start.board().is_solvable())) {
+        return {};
     }
-}
 
-auto game::is_finished() const -> bool {
-    return m_board.is_solved();
-}
+    auto finished = checked_fifteen{start.board().get_solved()};
 
-static std::vector<move> possible_moves_lookup[16];
-auto game::initialize_lookup() -> void {
-    for(uint8_t i = 0; i < 16; i++) {
-        if(i % 4 != 0) { // if it is not one of the leftmost tiles
-            possible_moves_lookup[i].push_back({static_cast<uint8_t>(i - 1), i});
-        }
-        if(i % 4 != 3) { // if it is not one of the rightmost tiles
-            possible_moves_lookup[i].push_back({static_cast<uint8_t>(i + 1), i});
-        }
-        if(i > 3) { // if it is not in the first row
-            possible_moves_lookup[i].push_back({static_cast<uint8_t>(i - 4), i});
-        }
-        if(i < 12) { // if it is not in the last row
-            possible_moves_lookup[i].push_back({static_cast<uint8_t>(i + 4), i});
-        }
-    }
-}
+    auto ret = std::optional<move_sequence>{};
 
-auto game::possible_moves() const -> const std::vector<move>& {
-    return possible_moves_lookup[zero_position];
-}
+    // A star
+    auto fifteen_comparator = [=](checked_fifteen l, checked_fifteen r) {
+        return heuristic(l.board()) < heuristic(r.board());
+    };
+    auto openSet = std::priority_queue<checked_fifteen, std::vector<checked_fifteen>, decltype(fifteen_comparator)>{fifteen_comparator};
 
-auto game::make_move(move m) -> void {
-    m_board.swap(m.index1, m.index2);
-    zero_position = m.index1;
-}
 
-auto game::make_move_and_print(move m) -> void {
-    make_move(m);
-    m_board.print();
-}
-
-auto game::board() -> fifteen& {
-    return m_board;
+    return ret;
 }
 
