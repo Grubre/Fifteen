@@ -5,4 +5,4 @@
 #include <optional>
 #include <functional>
 
-auto find_solution(std::function<int(fifteen)> heuristic) -> std::optional<checked_fifteen::move_sequence>;
+auto find_solution(checked_fifteen start, fifteen goal, std::function<int(const fifteen)> heuristic) -> std::optional<std::vector<checked_fifteen>>;

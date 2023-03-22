@@ -28,6 +28,10 @@ public:
     auto static initialize_lookup() -> void;
     auto static get_random() -> checked_fifteen;
     auto static get_move_lookup() -> const std::array<std::vector<move>, 16>&;
+public:
+    auto operator<=>(const checked_fifteen& other) const {
+        return (m_board.state <=> other.m_board.state);
+    }
 
 private:
     fifteen m_board;
