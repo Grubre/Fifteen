@@ -1,28 +1,28 @@
-#include "checked_fifteen.hpp"
+#include "fifteen.hpp"
 
-checked_fifteen::checked_fifteen() {
+fifteen::fifteen() {
     initialize_lookup();
 }
 
-checked_fifteen::checked_fifteen(fifteen f) : checked_fifteen::checked_fifteen() {
+fifteen::fifteen(fifteen_board f) : fifteen::fifteen() {
     m_board = f;
     zero_position = find_empty_tile_index();
 }
 
-auto checked_fifteen::get_random() -> checked_fifteen {
-    auto f = checked_fifteen{fifteen::get_random()};
+auto fifteen::get_random() -> fifteen {
+    auto f = fifteen{fifteen_board::get_random()};
     f.zero_position = f.find_empty_tile_index();
     return f;
 }
 
-auto checked_fifteen::is_solved() const -> bool {
+auto fifteen::is_solved() const -> bool {
     return m_board.is_solved();
 }
 
 static auto possible_moves_lookup = std::array<std::vector<move>, 16>{};
 static volatile bool lookup_filled = false;
 
-auto checked_fifteen::initialize_lookup() -> void {
+auto fifteen::initialize_lookup() -> void {
     if(lookup_filled) {
         return;
     }
@@ -44,20 +44,20 @@ auto checked_fifteen::initialize_lookup() -> void {
     lookup_filled = true;
 }
 
-auto checked_fifteen::get_move_lookup() -> const std::array<std::vector<move>, 16>& {
+auto fifteen::get_move_lookup() -> const std::array<std::vector<move>, 16>& {
     return possible_moves_lookup;
 }
 
-auto checked_fifteen::possible_moves() const -> const std::vector<move>& {
+auto fifteen::possible_moves() const -> const std::vector<move>& {
     return possible_moves_lookup[zero_position];
 }
 
-auto checked_fifteen::make_move(move m) -> void {
+auto fifteen::make_move(move m) -> void {
     m_board.swap(m.index1, m.index2);
     zero_position = m.index1;
 }
 
-auto checked_fifteen::find_empty_tile_index() -> index_type {
+auto fifteen::find_empty_tile_index() -> index_type {
     for(auto i = 0; i < 16; i++) {
         if(m_board.get(i) == 0) {
             return i;
@@ -66,9 +66,9 @@ auto checked_fifteen::find_empty_tile_index() -> index_type {
     return -1;
 }
 
-auto checked_fifteen::board() -> fifteen& {
+auto fifteen::board() -> fifteen_board& {
     return m_board;
 }
-auto checked_fifteen::board() const -> const fifteen& {
+auto fifteen::board() const -> const fifteen_board& {
     return m_board;
 }

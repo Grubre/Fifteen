@@ -35,7 +35,7 @@ auto get_md_lookup() -> const std::array<std::array<uint8_t, 16> ,16> {
     return md_lookup<>::table;
 }
 
-auto manhattan_distance(const fifteen board) -> uint32_t {
+auto manhattan_distance(const fifteen_board board) -> uint32_t {
     uint32_t acc = 0;
     for(uint32_t i = 0; i < 16; i++) {
         acc += md_lookup<>::table[board.get(i)][i];
@@ -43,14 +43,14 @@ auto manhattan_distance(const fifteen board) -> uint32_t {
     return acc;
 }
 
-auto linear_conflict(const fifteen) -> uint32_t {
+auto linear_conflict(const fifteen_board) -> uint32_t {
     //TODO
 }
 
-auto walking_distance(const fifteen) -> uint32_t {
+auto walking_distance(const fifteen_board) -> uint32_t {
     //TODO
 }
 
-auto misplaced_tile(const fifteen f) -> uint32_t {
+auto misplaced_tile(const fifteen_board f) -> uint32_t {
     return f.misplaced();
 }

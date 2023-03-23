@@ -4,21 +4,11 @@
 #include <limits>
 #include <algorithm>
 
-using move_sequence = checked_fifteen::move_sequence;
+using move_sequence = fifteen::move_sequence;
 
-auto reconstruct_path(std::map<checked_fifteen, checked_fifteen>& cameFrom, checked_fifteen current) -> std::vector<checked_fifteen> {
-    auto total_path = std::vector<checked_fifteen>{};
+auto reconstruct_path(std::map<fifteen, fifteen>& cameFrom, fifteen current) -> std::vector<fifteen> {
+    auto total_path = std::vector<fifteen>{};
     total_path.reserve(80);
-    // total_path.push_back(current);
-    // std::cout << "Expanded nodes:" << std::endl;
-    // for(auto[key,val] : cameFrom) {
-    //     std::cout << "=======================" << std::endl;
-    //     std::cout << "current:" << std::endl;
-    //     key.board().print();
-    //     std::cout << "previous:" << std::endl;
-    //     val.board().print();
-    //     std::cout << "=======================" << std::endl;
-    // }
     while(cameFrom.contains(current)) {
         auto next = cameFrom.at(current);
         cameFrom.erase(current);
@@ -28,37 +18,34 @@ auto reconstruct_path(std::map<checked_fifteen, checked_fifteen>& cameFrom, chec
     return total_path;
 }
 
-auto find_solution(checked_fifteen start, fifteen goal, std::function<int(const fifteen)> heuristic) -> std::optional<std::vector<checked_fifteen>> {
+auto find_solution(fifteen start, fifteen_board goal, std::function<int(const fifteen_board)> heuristic) -> std::optional<std::vector<fifteen>> {
     auto inf = std::numeric_limits<int>::max();
     if(!(start.board().is_valid() && start.board().is_solvable())) {
         return {};
     }
 
     // A star
-    auto fifteen_comparator = [=](checked_fifteen l, checked_fifteen r) {
+    auto fifteen_comparator = [=](fifteen l, fifteen r) {
         return heuristic(l.board()) > heuristic(r.board());
     };
-    auto openSet = std::priority_queue<checked_fifteen, std::vector<checked_fifteen>, decltype(fifteen_comparator)>{fifteen_comparator};
-    auto isInOpenSet = std::map<checked_fifteen, bool>{};
+    auto openSet = std::priority_queue<fifteen, std::vector<fifteen>, decltype(fifteen_comparator)>{fifteen_comparator};
+    auto isInOpenSet = std::map<fifteen, bool>{};
     openSet.push(start);
     isInOpenSet[start] = true;
 
-    auto cameFrom = std::map<checked_fifteen, checked_fifteen>{};
+    auto cameFrom = std::map<fifteen, fifteen>{};
 
-    auto gScore = std::map<checked_fifteen, int>{};
-    gScore[start] = 0;
+    auto distance = std::map<fifteen, int>{};
+    distance[start] = 0;
 
-    auto fScore = std::map<checked_fifteen, int>{};
-    fScore[start] = heuristic(start.board());
+    auto heuristic_eval = std::map<fifteen, int>{};
+    heuristic_eval[start] = heuristic(start.board());
 
-    cameFrom[start] = checked_fifteen{};
-    cameFrom[start] = checked_fifteen{};
+    cameFrom[start] = fifteen{};
+    cameFrom[start] = fifteen{};
 
     while(!openSet.empty()) {
         auto current = openSet.top();
-        // std::cout << "!!!!!current!!!!" << std::endl;
-        // current.board().print();
-        // std::cout << "!!!!!!!!!!!!!!!!" << std::endl;
         if(current.board() == goal) {
             // std::cout << "Reconstructing path..." << std::endl;
             auto path = reconstruct_path(cameFrom, current);
@@ -73,17 +60,14 @@ auto find_solution(checked_fifteen start, fifteen goal, std::function<int(const 
             auto neighbour = current;
             neighbour.make_move(move);
 
-            auto tentative_score = gScore[current] + 1;
+            auto tentative_score = distance[current] + 1;
 
-            gScore.try_emplace(neighbour, inf);
-            if(tentative_score < gScore[neighbour]) {
+            distance.try_emplace(neighbour, inf);
+            if(tentative_score < distance[neighbour]) {
                 cameFrom[neighbour] = current;
-                gScore[neighbour] = tentative_score;
-                fScore[neighbour] = tentative_score + heuristic(neighbour.board());
+                distance[neighbour] = tentative_score;
+                heuristic_eval[neighbour] = tentative_score + heuristic(neighbour.board());
                 if(!isInOpenSet[neighbour]) {
-                    // std::cout << "====neighbour===" << std::endl;
-                    // neighbour.board().print();
-                    // std::cout << "================" << std::endl;
                     isInOpenSet[neighbour] = true;
                     openSet.push(neighbour);
                 }

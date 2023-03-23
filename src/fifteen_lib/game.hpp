@@ -1,8 +1,8 @@
 #pragma once
-#include "checked_fifteen.hpp"
+#include "fifteen.hpp"
 #include <vector>
 #include <array>
 #include <optional>
 #include <functional>
 
-auto find_solution(checked_fifteen start, fifteen goal, std::function<int(const fifteen)> heuristic) -> std::optional<std::vector<checked_fifteen>>;
+auto find_solution(fifteen start, fifteen_board goal, std::function<int(const fifteen_board)> heuristic) -> std::optional<std::vector<fifteen>>;

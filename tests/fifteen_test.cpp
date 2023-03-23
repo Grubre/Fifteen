@@ -1,4 +1,4 @@
-#include "fifteen.hpp"
+#include "fifteen_board.hpp"
 #include <gtest/gtest.h>
 
 TEST(fifteen_test, default_constructor_test) {

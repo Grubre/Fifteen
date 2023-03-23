@@ -21,8 +21,8 @@ Iter select_randomly(Iter start, Iter end) {
     return select_randomly(start, end, gen);
 }
 
-auto get_start() -> checked_fifteen {
-    auto ret = checked_fifteen{fifteen::get_solved()};
+auto get_start() -> fifteen {
+    auto ret = fifteen{fifteen_board::get_solved()};
     for(int i = 0; i < 20; i++) {
         // ret.board().print();
         // std::cout << "================" << std::endl;
@@ -32,10 +32,10 @@ auto get_start() -> checked_fifteen {
 }
 
 auto main() -> int {
-    auto start = checked_fifteen::get_random();
+    auto start = fifteen::get_random();
     // auto start = get_start();
     start.board().print();
-    auto finish = fifteen::get_solved();
+    auto finish = fifteen_board::get_solved();
     auto x = find_solution(start, finish, manhattan_distance);
     if(x) {
         std::cout << "solution:" << std::endl;
