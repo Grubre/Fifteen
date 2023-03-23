@@ -47,5 +47,9 @@ auto main() -> int {
     } else {
         std::cout << "not found" << std::endl;
     }
+    // auto f = fifteen{0x6D7A89B0F2C5E314};
+    // auto f = fifteen{0x391FEB46D0AC2785};
+    // std::cout << std::boolalpha << f.is_valid() << std::endl;
+    // std::cout << std::boolalpha << f.is_solvable() << std::endl;
     return 0;
 }

@@ -89,23 +89,28 @@ auto constexpr fifteen::is_valid() const -> bool {
     return true;
 }
 
-auto constexpr fifteen::is_solvable() const -> bool {
+inline constexpr auto fifteen::is_solvable() const -> bool {
     auto inversion_cnt = 0;
     for(auto i = 0; i < 15; i++) {
         for(auto j = i + 1; j < 16; j++) {
-            if(i != 0 && j != 0 && get(i) > get(j)) {
+            if(get(i) != 0 && get(j) != 0 && get(i) > get(j)) {
                 inversion_cnt++;
             }
         }
     }
+    // std::cout << "inversion_cnt = " << inversion_cnt << std::endl;
     auto zero_pos = 0;
     for(auto i = 0; i < 16; i++) {
         if(get(i) == 0) {
-            zero_pos = i;
+            zero_pos = i / 4;
             break;
         }
     }
-    return ((zero_pos / 4) % 2 == 1) && (inversion_cnt % 2 == 0);
+    // std::cout << "zero_pos = " << zero_pos << std::endl;
+    if (zero_pos & 1)
+        return !(inversion_cnt & 1);
+    else
+        return inversion_cnt & 1;
 }
 
 auto constexpr fifteen::swap(index_type index1, index_type index2) -> void {
