@@ -90,7 +90,22 @@ auto constexpr fifteen::is_valid() const -> bool {
 }
 
 auto constexpr fifteen::is_solvable() const -> bool {
-    return true;
+    auto inversion_cnt = 0;
+    for(auto i = 0; i < 15; i++) {
+        for(auto j = i + 1; j < 16; j++) {
+            if(i != 0 && j != 0 && get(i) > get(j)) {
+                inversion_cnt++;
+            }
+        }
+    }
+    auto zero_pos = 0;
+    for(auto i = 0; i < 16; i++) {
+        if(get(i) == 0) {
+            zero_pos = i;
+            break;
+        }
+    }
+    return ((zero_pos / 4) % 2 == 1) && (inversion_cnt % 2 == 0);
 }
 
 auto constexpr fifteen::swap(index_type index1, index_type index2) -> void {
