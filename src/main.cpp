@@ -33,6 +33,7 @@ auto get_start() -> fifteen {
 
 auto main() -> int {
     auto start = fifteen::get_random();
+    // auto start = fifteen{0x159D26AE37BF48C0};
     // auto start = get_start();
     start.board().print();
     auto finish = fifteen_board::get_solved();

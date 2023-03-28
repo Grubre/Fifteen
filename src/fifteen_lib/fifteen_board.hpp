@@ -26,6 +26,8 @@ struct fifteen_board {
     auto constexpr is_valid() const -> bool;
     auto constexpr is_solvable() const -> bool;
 
+    auto constexpr inversions() const -> uint32_t;
+
     auto constexpr operator==(const fifteen_board& other) const -> bool;
     auto constexpr operator!=(const fifteen_board& other) const -> bool;
 
@@ -90,15 +92,7 @@ auto constexpr fifteen_board::is_valid() const -> bool {
 }
 
 inline constexpr auto fifteen_board::is_solvable() const -> bool {
-    auto inversion_cnt = 0;
-    for(auto i = 0; i < 15; i++) {
-        for(auto j = i + 1; j < 16; j++) {
-            if(get(i) != 0 && get(j) != 0 && get(i) > get(j)) {
-                inversion_cnt++;
-            }
-        }
-    }
-    // std::cout << "inversion_cnt = " << inversion_cnt << std::endl;
+    auto inversion_cnt = inversions();    // std::cout << "inversion_cnt = " << inversion_cnt << std::endl;
     auto zero_pos = 0;
     for(auto i = 0; i < 16; i++) {
         if(get(i) == 0) {
@@ -147,4 +141,16 @@ inline auto fifteen_board::print() const -> void {
     for(auto i = 0; i <= 3; i++) {
         std::printf("[%2d][%2d][%2d][%2d]\n", get(4 * i), get(4 * i + 1), get(4 * i + 2), get(4 * i + 3));
     }
+}
+
+auto constexpr fifteen_board::inversions() const -> uint32_t {
+    auto inversion_cnt = 0;
+    for(auto i = 0; i < 15; i++) {
+        for(auto j = i + 1; j < 16; j++) {
+            if(get(i) != 0 && get(j) != 0 && get(i) > get(j)) {
+                inversion_cnt++;
+            }
+        }
+    }
+    return inversion_cnt;
 }

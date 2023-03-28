@@ -51,6 +51,10 @@ auto walking_distance(const fifteen_board) -> uint32_t {
     //TODO
 }
 
+auto inversion_distance(const fifteen_board f) -> uint32_t {
+    return f.inversions();
+}
+
 auto misplaced_tile(const fifteen_board f) -> uint32_t {
     return f.misplaced();
 }
