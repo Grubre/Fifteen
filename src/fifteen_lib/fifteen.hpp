@@ -32,8 +32,31 @@ public:
     auto operator<=>(const fifteen& other) const {
         return (m_board.state <=> other.m_board.state);
     }
+    auto operator==(const fifteen& other) const {
+        return (m_board.state == other.m_board.state);
+    }
+
 
 private:
     fifteen_board m_board;
     uint8_t zero_position;
 };
+
+namespace std {
+
+  template <>
+  struct hash<fifteen>
+  {
+    std::size_t operator()(const fifteen& k) const
+    {
+      using std::hash;
+
+      // Compute individual hash values for first,
+      // second and third and combine them using XOR
+      // and bit shifting:
+
+      return hash<uint64_t>()(k.board().state);
+    }
+  };
+
+}

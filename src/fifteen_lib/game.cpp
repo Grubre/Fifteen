@@ -28,17 +28,17 @@ auto find_solution(fifteen start, fifteen_board goal, std::function<int(const fi
         return std::nullopt;
     }
 
-    auto distance = std::map<fifteen, int>{};
-    auto heuristic_eval = std::map<fifteen, int>{};
+    auto distance = std::unordered_map<fifteen, int>{};
+    auto heuristic_eval = std::unordered_map<fifteen, int>{};
 
     // A star
     auto fifteen_comparator = [&](fifteen l, fifteen r) {
-        return distance[l] + heuristic(l.board()) > distance[r] + heuristic(r.board());
+        return distance[l] + heuristic_eval[l.board()] > distance[r] + heuristic_eval[r.board()];
         // return heuristic(l.board()) > heuristic(r.board());
     };
 
     auto openSet = std::priority_queue<fifteen, std::vector<fifteen>, decltype(fifteen_comparator)>{fifteen_comparator};
-    auto isInOpenSet = std::map<fifteen, bool>{};
+    auto isInOpenSet = std::unordered_map<fifteen, bool>{};
 
     auto push_to_open_set = [&](fifteen a) {
         openSet.push(a);

@@ -23,7 +23,7 @@ Iter select_randomly(Iter start, Iter end) {
 
 auto get_start() -> fifteen {
     auto ret = fifteen{fifteen_board::get_solved()};
-    for(int i = 0; i < 80; i++) {
+    for(int i = 0; i < 60; i++) {
         // ret.board().print();
         // std::cout << "================" << std::endl;
         ret.make_move(*select_randomly(ret.possible_moves().begin(), ret.possible_moves().end()));
@@ -32,9 +32,11 @@ auto get_start() -> fifteen {
 }
 
 auto main() -> int {
-    auto start = fifteen::get_random();
-    // auto start = fifteen{0x159D26AE37BF48C0};
+    auto start = fifteen{0x12035967eb84adfc};
     // auto start = get_start();
+    // auto start = fifteen::get_random();
+    std::cout << std::hex << start.board().state << std::endl;
+    std::cout << std::dec;
 
     std::cout << "starting position:" << std::endl;
     start.board().print();
