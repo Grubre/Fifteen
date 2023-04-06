@@ -40,7 +40,7 @@ auto manhattan_distance(const fifteen_board board) -> uint32_t {
     for(uint32_t i = 0; i < 16; i++) {
         acc += md_lookup<>::table[board.get(i)][i];
     }
-    return acc;
+    return acc / 2;
 }
 
 auto linear_conflict(const fifteen_board) -> uint32_t {

@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include <optional>
 #include <queue>
 #include <map>
 #include <limits>
@@ -18,43 +19,57 @@ auto reconstruct_path(std::map<fifteen, fifteen>& cameFrom, fifteen current) -> 
     return total_path;
 }
 
-auto find_solution(fifteen start, fifteen_board goal, std::function<int(const fifteen_board)> heuristic) -> std::optional<std::vector<fifteen>> {
-    auto inf = std::numeric_limits<int>::max();
+auto find_solution(fifteen start, fifteen_board goal, std::function<int(const fifteen_board)> heuristic) -> std::optional<solution> {
+    const auto inf = std::numeric_limits<int>::max();
+
+    uint64_t opened_nodes_cnt = 0;
+
     if(!(start.board().is_valid() && start.board().is_solvable())) {
-        return {};
+        return std::nullopt;
     }
 
+    auto distance = std::map<fifteen, int>{};
+    auto heuristic_eval = std::map<fifteen, int>{};
+
     // A star
-    auto fifteen_comparator = [=](fifteen l, fifteen r) {
-        return heuristic(l.board()) > heuristic(r.board());
+    auto fifteen_comparator = [&](fifteen l, fifteen r) {
+        return distance[l] + heuristic(l.board()) > distance[r] + heuristic(r.board());
+        // return heuristic(l.board()) > heuristic(r.board());
     };
+
     auto openSet = std::priority_queue<fifteen, std::vector<fifteen>, decltype(fifteen_comparator)>{fifteen_comparator};
     auto isInOpenSet = std::map<fifteen, bool>{};
-    openSet.push(start);
-    isInOpenSet[start] = true;
+
+    auto push_to_open_set = [&](fifteen a) {
+        openSet.push(a);
+        isInOpenSet[a] = true;
+    };
+    auto remove_from_open_set = [&](fifteen a) {
+        openSet.pop();
+        isInOpenSet[a] = false;
+    };
+
+    push_to_open_set(start);
 
     auto cameFrom = std::map<fifteen, fifteen>{};
 
-    auto distance = std::map<fifteen, int>{};
     distance[start] = 0;
 
-    auto heuristic_eval = std::map<fifteen, int>{};
     heuristic_eval[start] = heuristic(start.board());
 
-    cameFrom[start] = fifteen{};
     cameFrom[start] = fifteen{};
 
     while(!openSet.empty()) {
         auto current = openSet.top();
+        opened_nodes_cnt++;
         if(current.board() == goal) {
             // std::cout << "Reconstructing path..." << std::endl;
             auto path = reconstruct_path(cameFrom, current);
             std::ranges::reverse(path);
-            return path;
+            return solution{.path = path, .opened_nodes_cnt = opened_nodes_cnt};
         }
 
-        openSet.pop();
-        isInOpenSet[current] = false;
+        remove_from_open_set(current);
 
         for(auto move : current.possible_moves()) {
             auto neighbour = current;
@@ -68,8 +83,7 @@ auto find_solution(fifteen start, fifteen_board goal, std::function<int(const fi
                 distance[neighbour] = tentative_score;
                 heuristic_eval[neighbour] = tentative_score + heuristic(neighbour.board());
                 if(!isInOpenSet[neighbour]) {
-                    isInOpenSet[neighbour] = true;
-                    openSet.push(neighbour);
+                    push_to_open_set(neighbour);
                 }
             }
         }

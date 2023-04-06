@@ -4,8 +4,8 @@
 #include "heuristics.hpp"
 #include <array>
 #include <algorithm>
-#include  <random>
-#include  <iterator>
+#include <random>
+#include <iterator>
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -23,7 +23,7 @@ Iter select_randomly(Iter start, Iter end) {
 
 auto get_start() -> fifteen {
     auto ret = fifteen{fifteen_board::get_solved()};
-    for(int i = 0; i < 20; i++) {
+    for(int i = 0; i < 80; i++) {
         // ret.board().print();
         // std::cout << "================" << std::endl;
         ret.make_move(*select_randomly(ret.possible_moves().begin(), ret.possible_moves().end()));
@@ -35,22 +35,24 @@ auto main() -> int {
     auto start = fifteen::get_random();
     // auto start = fifteen{0x159D26AE37BF48C0};
     // auto start = get_start();
+
+    std::cout << "starting position:" << std::endl;
     start.board().print();
     auto finish = fifteen_board::get_solved();
-    auto x = find_solution(start, finish, manhattan_distance);
-    if(x) {
-        std::cout << "solution:" << std::endl;
-        for(auto i : *x) {
-            i.board().print();
-            std::cout << "================" << std::endl;
-        }
-        std::cout << "solution len = " << x->size() << std::endl;
-    } else {
-        std::cout << "not found" << std::endl;
+
+    if(!start.board().is_valid() || !start.board().is_solvable()) {
+        std::cout << "solution cant be found" << std::endl;
+        return 0;
     }
-    // auto f = fifteen{0x6D7A89B0F2C5E314};
-    // auto f = fifteen{0x391FEB46D0AC2785};
-    // std::cout << std::boolalpha << f.is_valid() << std::endl;
-    // std::cout << std::boolalpha << f.is_solvable() << std::endl;
+
+    auto manhattan = find_solution(start, finish, manhattan_distance);
+    std::cout << "=======================" << std::endl;
+    std::cout << "manhattan:" << std::endl;
+    manhattan->print_solution();
+    // auto id        = find_solution(start, finish, inversion_distance);
+    // std::cout << "=======================" << std::endl;
+    // std::cout << "inversion distance:" << std::endl;
+    // id->print_solution();
+
     return 0;
 }
